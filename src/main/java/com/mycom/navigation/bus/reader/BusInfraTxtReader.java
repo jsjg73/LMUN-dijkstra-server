@@ -17,13 +17,11 @@ import com.mycom.navigation.bus.BusInfra;
  * */
 public class BusInfraTxtReader implements BusInfraReader{
 
-	public BusInfra createBusInfra() {
-		BusInfra bif =null;
+	public void readBusInfra(BusInfra bif) {
 		try {
 			FileInputStream file = new FileInputStream("C:/workspace/practice/ReadExcelFile/Stations.txt");
 			BufferedReader br = new BufferedReader(new InputStreamReader(file));
 			String line = null;
-			bif = new BusInfra();
 			while((line = br.readLine())!= null) { // EoF
 				String[] infs = line.split("\t");
 				bif.extendInfra(infs);
@@ -35,7 +33,6 @@ public class BusInfraTxtReader implements BusInfraReader{
 			e.printStackTrace();
 		}
 		
-		return bif;
 	}
 	
 }

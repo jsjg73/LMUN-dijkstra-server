@@ -8,6 +8,7 @@ import java.util.Set;
 import com.mycom.navigation.bus.dto.Bus;
 import com.mycom.navigation.bus.dto.BusStation;
 import com.mycom.navigation.bus.dto.Edge;
+import com.mycom.navigation.bus.reader.BusInfraReader;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -35,9 +36,14 @@ public class BusInfra {
 	@Setter(AccessLevel.NONE)
 	private BusStation preStation;
 	
+	public BusInfra (BusInfraReader reader) {
+		// 버스 인프라 생성
+		reader.readBusInfra(this);
+	}
+	
 	public void extendInfra(String[] infs) {
 		
-		
+		//버스 정보 추가
 		if(!containsBus(infs[BUS_ID])) {
 			Bus bus = Bus.builder()
 					.id(infs[BUS_ID])
@@ -45,6 +51,8 @@ public class BusInfra {
 					.build();
 			putBus(bus);
 		}
+		
+		//정류장 정보 추가
 		BusStation station=null;
 		if((station = containsBusStation(infs[NODE_ID]))==null) {
 			station = BusStation.builder()
@@ -57,7 +65,7 @@ public class BusInfra {
 			putBusStation(station);
 		}
 		
-		// 정류장 연결
+		// 간선 정보 생성
 		if("1".equals(infs[ORDER])) {
 			preStation = station;
 		}else {

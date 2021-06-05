@@ -10,9 +10,9 @@ public class Main {
 	// C:\workspace\practice\ReadExcelFile\BusStation.xlsx
 	public static void main(String[] args) {
 		
-		BusInfra bif = new BusInfraTxtReader().createBusInfra();
+		BusInfra bif = new BusInfra(new BusInfraTxtReader());
 //		new BusInfraTxtWriter().writeEdges(bif);;
-		new BusInfraTxtWriter().writePath(6000, bif.getBusStationTbl());
+//		new BusInfraTxtWriter().writePath(6000, bif.getBusStationTbl());
 		System.out.println("done");
 		// 7.3	MB
 //		NPath np = new NPath();
