@@ -17,3 +17,8 @@ STEP B
 STEP C 
 사용자 입력 받아서 최적 경로 구현
 고려사항 : 최적 경로 정책 결정(환승 시 코스트 증가)
+
+필요한 정보 목록( txt 파일 )
+Stations.txt : 서울시 버스 노선 및 정류장 정보, 출처 - 공공데이터서비스
+Edges.txt : Statsions에서 추출한 간선 정보, real path를 받아왔는지 여부를 첫번째 컬럼으로 알 수있음(0 or 1)
+EdgeData :  naver api를 통해 미리 받아온 정류장 간의 real path
