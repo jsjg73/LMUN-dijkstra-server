@@ -105,32 +105,6 @@ public class BusInfra {
 			preStation = station;
 		}
 	}
-	public void arroudStations(double limit) {
-		Distance dis = new Distance();
-		List<BusStation> list = new ArrayList<BusStation>();
-		
-		for(Map.Entry<String, BusStation> entry : busStationTbl.entrySet()) {
-			list.add(entry.getValue());
-		}
-		
-		int i=0;
-		for(BusStation bs : list) {
-			i++;
-			if(i%1000==0)System.out.println(i);
-//			double sx = bs.getX();
-//			double sy = bs.getY();
-			for(BusStation bs2 : list) {
-				if(bs == bs2)continue;
-//				double ex = bs2.getX();
-//				double ey = bs2.getY();
-//				double d = dis.distance(sy, sx, ey, ex);
-//				if(d<=limit) {
-//					bs.addArround(bs2);
-//					edgeSet.add(new Edge(bs,bs2));
-//				}
-			}
-		}
-	}
 	private boolean containsBus(String busId) {
 		return busTbl.containsKey(busId);
 	}
