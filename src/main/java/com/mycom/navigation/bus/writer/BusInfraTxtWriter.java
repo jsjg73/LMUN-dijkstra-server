@@ -11,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import com.mycom.navigation.bus.BusInfra;
 import com.mycom.navigation.bus.dto.BusStation;
@@ -90,10 +91,10 @@ public class BusInfraTxtWriter {
 					
 					//api 요청 재료 세팅
 					NPath np = new NPath();
-					np.setEx(to.getX());
-					np.setEy(to.getY());
-					np.setSx(from.getX());
-					np.setSy(from.getY());
+					np.setEx(to.getX()+"");
+					np.setEy(to.getY()+"");
+					np.setSx(from.getX()+"");
+					np.setSy(from.getY()+"");
 					
 					//api 요청
 					naver.getPath(np);
@@ -133,5 +134,26 @@ public class BusInfraTxtWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	public void writeSectionImage(BusInfra bif) throws IOException {
+		int row = bif.getRow();
+		int col = bif.getCol();
+		Set<BusStation>[] sections = bif.getSections();
+		FileOutputStream file = new FileOutputStream("C:/workspace/practice/ReadExcelFile/sectionImage.txt");
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(file));
+		for(int i=0; i<row+2; i++) {
+			for(int j=0; j<col+2; j++) {
+				if(sections[j+i*500]!=null) {
+					int size= sections[j+i*500].size();
+					String s = size+",";
+					bw.write(s);
+				}else {
+					bw.write("0,");
+				}
+			}
+			bw.write("\n");
+			bw.flush();
+		}
+		bw.close();
 	}
 }
