@@ -58,9 +58,12 @@ public class BusInfra {
 	@Setter(AccessLevel.NONE)
 	private BusStation preStation;
 	
-	public BusInfra (BusInfraReader reader) {
+	
+	public BusInfra (BusInfraReader reader, int row, int col) {
 		// 버스 인프라 생성
 		reader.readBusInfra(this);
+		this.row = row;
+		this.col = col;
 	}
 	
 	public void extendInfra(String[] infs) {
@@ -125,9 +128,7 @@ public class BusInfra {
 	
 	double XUnit;
 	double YUnit;
-	public void dividingIntoArea(int row, int col) throws IOException {
-		this.row=row;
-		this.col=col;
+	public void dividingIntoArea() throws IOException {
 		if(busStationTbl == null) {
 			throw new IllegalStateException("모든 버스 정류장 정보가 필요합니다.");
 		}
