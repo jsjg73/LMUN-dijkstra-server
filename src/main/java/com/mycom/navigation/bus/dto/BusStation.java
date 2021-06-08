@@ -1,6 +1,9 @@
 package com.mycom.navigation.bus.dto;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import lombok.Builder;
@@ -18,19 +21,35 @@ public class BusStation {
 	private String name;
 	private double x;
 	private double y;
-	private Set<BusStation> nextSet;
-	private Set<BusStation> arroundSet;
+	private Map<BusStation, Integer> nextSet;
+	private Set<Bus> buses;
 	private int sectionIndex;
 	
-	public boolean addNext(BusStation station) {
-		if(station == null)return false;
-		if(nextSet == null)nextSet = new HashSet<BusStation>();
-		return nextSet.add(station);
+	public Integer addNext(BusStation station, int cost) {
+		if(station == null)return 0;
+		if(nextSet == null)nextSet = new HashMap<BusStation, Integer>();
+		if(nextSet.containsKey(station)) {
+			int val = nextSet.get(station);
+			cost = Math.min(cost, val);
+		}
+		return nextSet.put(station, cost);
 	}
-	public boolean addArround(BusStation station) {
-		if(station == null)return false;
-		if(arroundSet == null)arroundSet = new HashSet<BusStation>();
-		return arroundSet.add(station);
+	public Set<Entry<BusStation, Integer>> getNextEntry() {
+		return nextSet.entrySet();
+	}
+	public boolean unusedStation() {
+		return name.contains("(가상)") || name.contains("(경유)");
 	}
 	
+	public void addBus(Bus b) {
+		if(b==null)return;
+		
+		if(buses == null) {
+			buses = new HashSet<Bus>();
+		}
+		buses.add(b);
+	}
+	public boolean existBus(Bus b) {
+		return buses.contains(b);
+	}
 }

@@ -54,9 +54,6 @@ public class BusInfra {
 	private double maxY = 0;
 	private int row,col;
 	
-	@Getter(AccessLevel.NONE)
-	@Setter(AccessLevel.NONE)
-	private BusStation preStation;
 	
 	
 	public BusInfra (BusInfraReader reader, int row, int col) {
@@ -66,11 +63,18 @@ public class BusInfra {
 		this.col = col;
 	}
 	
+	@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	private BusStation preStation;
+	@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	private int val=1;
+	
 	public void extendInfra(String[] infs) {
-		
+		Bus bus = busTbl.get(infs[BUS_ID]);
 		//버스 정보 추가
-		if(!containsBus(infs[BUS_ID])) {
-			Bus bus = Bus.builder()
+		if(bus == null) {
+			bus = Bus.builder()
 					.id(infs[BUS_ID])
 					.name(infs[BUS_NM])
 					.build();
@@ -79,10 +83,10 @@ public class BusInfra {
 		
 		//정류장 정보 추가
 		BusStation station=null;
-		int stationIndex =0;
+		
 		if((station = containsBusStation(infs[NODE_ID]))==null) {
 			station = BusStation.builder()
-										.idx(stationIndex++)
+										.idx(stationSize())
 										.nodeId(infs[NODE_ID])
 										.arsId(infs[ARS_ID])
 										.name(infs[STATION_NM])
@@ -96,16 +100,22 @@ public class BusInfra {
 			maxY=Math.max(maxY, station.getY());
 		}
 		
-		// 간선 정보 생성
+		// 버스 추가
+		station.addBus(bus);
+		
+		// 인접 정류장 추가
 		if("1".equals(infs[ORDER])) {
 			preStation = station;
-		}else {
-			preStation.addNext(station);
+		}else if(station.unusedStation()){//가상 정류장
+			val+=9;
+		}else{
+			preStation.addNext(station, val);
 			
 //			"C:/workspace/practice/ReadExcelFile/Edges.txt"에 저장할 때 사용
 			edgeSet.add(new Edge(preStation, station));
 			
 			preStation = station;
+			val =1;
 		}
 	}
 	private boolean containsBus(String busId) {
@@ -143,19 +153,52 @@ public class BusInfra {
 		
 		for(Map.Entry<String , BusStation> ent : busStationTbl.entrySet()) {
 			BusStation bs = ent.getValue();
-			int sectionIdx = calSectionIndex(bs);
+			int sectionIdx = calSectionIndex(bs.getX(), bs.getY());
 			if(sections[sectionIdx] == null) {
 				sections[sectionIdx] = new HashSet<BusStation>();
 			}
 			sections[sectionIdx].add(bs);
+			bs.setSectionIndex(sectionIdx);
 		}
 	}
-	private int calSectionIndex(BusStation station) {
+	public int calSectionIndex(double x, double y) {
 		
-		double tgX = station.getX();
-		double tgY = station.getY();
-		int x = (int)( (tgX-minX)/XUnit );
-		int y = (int)( (tgY-minY)/YUnit );
-		return y*500+x+1;
+		int a = cvtX2R(x);
+		int b = cvtY2C(y);
+		
+		return convertRC2Idx(a, b);
+	}
+	
+	public int convertRC2Idx(int r, int c) {
+		return c*col+r+1;
+	}
+	public int[] convertIdx2RC(int idx) {
+		int r = (idx-1)%col;
+		int c = (idx-1)/col;
+		return new int[] {r,c};
+	}
+	public int cvtX2R(double x) {
+		return (int)( (x-minX)/XUnit );
+	}
+	public int cvtY2C(double y) {
+		return (int)( (y-minY)/YUnit );
+	}
+	public boolean existStionInSection(int r, int c) {
+		Set<BusStation> section = busStaionsInSection(r, c);
+		if(section == null)return false;
+		for(BusStation bs : section) {
+			if(bs.unusedStation())continue;
+			return true;
+		}
+		return false;
+	}
+	public Set<BusStation> busStaionsInSection(int r, int c){
+		return sections[convertRC2Idx(r, c)];
+	}
+	public Set<BusStation> busStaionsInSection(int sectionIdx){
+		return sections[sectionIdx];
+	}
+	public int stationSize() {
+		return busStationTbl.size();
 	}
 }
