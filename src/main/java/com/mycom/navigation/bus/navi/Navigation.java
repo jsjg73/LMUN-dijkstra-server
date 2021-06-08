@@ -1,5 +1,7 @@
 package com.mycom.navigation.bus.navi;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -18,7 +20,7 @@ public class Navigation {
 		this.bif=bif;
 	}
 	
-	public String navigate(double sx, double sy, double ex, double ey) {
+	public List<String> navigate(double sx, double sy, double ex, double ey) {
 		Set<BusStation> startStaions = bif.arrounStations(sx, sy);
 		Set<BusStation> endStations = bif.arrounStations(ex, ey);
 		
@@ -81,18 +83,25 @@ public class Navigation {
 			}
 		}
 		
-		if(endpoint!=null) {
-			int idx = endpoint.getIdx();
-			while(true) {
-				System.out.println(idx+" "+v_cost[idx]+" "+bsArr[idx].getName()+"\t");
-				if(v_before[idx]==null)break;
-				idx = v_before[idx].getIdx();
-			}
-			
-			return endpoint.getName();
+		if(endpoint == null) return null;
+		
+		List<BusStation> list = new ArrayList<BusStation>();
+		int idx = endpoint.getIdx();
+		while(true) {
+			list.add(bsArr[idx]);
+			if(v_before[idx]==null)break;
+			idx = v_before[idx].getIdx();
 		}
-		else
-			return "결과를 찾지 못했다";
+		
+		List<String> re = new ArrayList<String>();
+		for(int i=list.size()-1; i>0; i--) {
+			BusStation from = list.get(i);
+			BusStation to = list.get(i-1);
+			re.add(from.getRealPath().get(to.getNodeId()));
+		}
+		
+		
+		return re;
 	}
 	class Dijk implements Comparable<Dijk>{
 		int cost;
@@ -111,4 +120,5 @@ public class Navigation {
 		}
 
 	}
+	
 }

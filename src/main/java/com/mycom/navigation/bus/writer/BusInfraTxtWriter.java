@@ -21,31 +21,31 @@ import com.mycompany.myapp.naver.NaverAPI;
 import com.mycompany.myapp.naver.NaverJsonParsing;
 
 public class BusInfraTxtWriter {
-	public void writeEdges(BusInfra bif) {
-		try {
-			FileOutputStream file = new FileOutputStream("C:/workspace/practice/ReadExcelFile/Edges.txt");
-			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(file));
-			
-			Iterator<Edge> it = bif.getEdgeSet().iterator();
-			while(it.hasNext()) {
-				Edge e = it.next();
-				bw.write("0\t" );
-				bw.write(e.getFrom().getNodeId());
-				bw.write("\t");
-				bw.write(e.getTo().getNodeId());
-				bw.write("\t\n");;
-			}
-			
-			bw.flush();
-			bw.close();
-			file.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		
-	}
+//	public void writeEdges(BusInfra bif) {
+//		try {
+//			FileOutputStream file = new FileOutputStream("C:/workspace/practice/ReadExcelFile/Edges.txt");
+//			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(file));
+//			
+//			Iterator<Edge> it = bif.getEdgeSet().iterator();
+//			while(it.hasNext()) {
+//				Edge e = it.next();
+//				bw.write("0\t" );
+//				bw.write(e.getFrom().getNodeId());
+//				bw.write("\t");
+//				bw.write(e.getTo().getNodeId());
+//				bw.write("\t\n");;
+//			}
+//			
+//			bw.flush();
+//			bw.close();
+//			file.close();
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//		}
+//		
+//	}
 	
 	public void writePath(int amount, Map<String, BusStation> busStationTbl) {
 		try {

@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.mycom.navigation.bus.BusInfra;
 /*
@@ -34,5 +36,21 @@ public class BusInfraTxtReader implements BusInfraReader{
 		}
 		
 	}
-	
+	public List<String[]> loadRealPath() {
+		FileInputStream file;
+		List<String[]> list = new ArrayList<String[]>();
+		try {
+			file = new FileInputStream("C:/workspace/practice/ReadExcelFile/EdgeData.txt");
+			BufferedReader br = new BufferedReader(new InputStreamReader(file));
+			String line = null;
+			while((line = br.readLine())!= null) { // EoF
+				String[] infs = line.split("\t");
+				list.add(infs);
+			}
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
 }

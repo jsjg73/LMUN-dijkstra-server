@@ -21,6 +21,7 @@ public class BusStation {
 	private double x;
 	private double y;
 	private Map<BusStation, Integer> next;
+	private Map<String, String> realPath;
 	private int sectionIndex;
 	
 	private int sectionRow;
@@ -40,5 +41,8 @@ public class BusStation {
 	public boolean unusedStation() {
 		return name.contains("(가상)") || name.contains("(경유)");
 	}
-	
+	public void addRealPath(String stationNodeId, String path) {
+		if(realPath == null)realPath= new HashMap<String, String>();
+		realPath.put(stationNodeId, path);
+	}
 }

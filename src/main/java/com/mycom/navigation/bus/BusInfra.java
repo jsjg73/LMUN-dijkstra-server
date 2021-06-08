@@ -1,27 +1,14 @@
 package com.mycom.navigation.bus;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import com.mycom.navigation.bus.dto.Bus;
 import com.mycom.navigation.bus.dto.BusStation;
-import com.mycom.navigation.bus.dto.Edge;
 import com.mycom.navigation.bus.reader.BusInfraReader;
 import com.mycom.navigation.bus.section.BusSection;
-import com.mycom.navigation.bus.section.RC;
-import com.mycom.navigation.bus.writer.BusInfraTxtWriter;
-import com.mycompany.myapp.naver.Distance;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -49,8 +36,8 @@ public class BusInfra {
 	
 	private Map<String, Bus> busTbl = new HashMap<String, Bus>();
 	private Map<String, BusStation> busStationTbl = new HashMap<String, BusStation>();
-	private Set<Edge> edgeSet = new HashSet<Edge>();
-	
+//	private Set<Edge> edgeSet = new HashSet<Edge>();
+	private Map<String, HashMap<String, String>> realPathData;
 	private BusSection section;
 	
 	public BusInfra (int row, int col) {
@@ -105,10 +92,22 @@ public class BusInfra {
 			preStation.addNext(station, val);
 			
 //			"C:/workspace/practice/ReadExcelFile/Edges.txt"에 저장할 때 사용
-			edgeSet.add(new Edge(preStation, station));
+//			edgeSet.add(new Edge(preStation, station));
 			
 			preStation = station;
 			val =1;
+		}
+	}
+	
+	public void loadRealPath(BusInfraReader reader) {
+		realPathData = new HashMap<String, HashMap<String,String>>(); 
+		
+		List<String[]> listRealPath = reader.loadRealPath();
+		for(String[] arr : listRealPath) {
+			String from = arr[0];
+			String to = arr[1];
+			BusStation f = busStationTbl.get(from);
+			f.addRealPath(to, arr[2]);
 		}
 	}
 	private boolean containsBus(String busId) {
