@@ -136,15 +136,13 @@ public class BusInfraTxtWriter {
 		}
 	}
 	public void writeSectionImage(BusInfra bif) throws IOException {
-		int row = bif.getRow();
-		int col = bif.getCol();
-		Set<BusStation>[] sections = bif.getSections();
+		Set<BusStation>[][] sections = bif.getSectionArray();
 		FileOutputStream file = new FileOutputStream("C:/workspace/practice/ReadExcelFile/sectionImage.txt");
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(file));
-		for(int i=0; i<row+2; i++) {
-			for(int j=0; j<col+2; j++) {
+		for(int i=0; i<sections.length; i++) {
+			for(int j=0; j<sections[i].length+2; j++) {
 				if(sections[j+i*500]!=null) {
-					int size= sections[j+i*500].size();
+					int size= sections[i][j].size();
 					String s = size+",";
 					bw.write(s);
 				}else {

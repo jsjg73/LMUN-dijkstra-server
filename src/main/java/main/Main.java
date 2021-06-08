@@ -17,8 +17,8 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		
 		// 버스 인프라 구축
-		BusInfra bif = new BusInfra(new BusInfraTxtReader(),500, 500);
-		
+		BusInfra bif = new BusInfra(500, 500);
+		bif.constructInfra(new BusInfraTxtReader());
 		// 버스 정류장 영역 구분 
 		// 500칸*500칸, (대략, 가로 140m * 세로 120m)
 		bif.dividingIntoArea();

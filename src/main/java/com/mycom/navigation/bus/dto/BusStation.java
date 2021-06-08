@@ -15,41 +15,30 @@ import lombok.Setter;
 @Builder
 public class BusStation {
 	private int idx;
-	private Bus bus;
 	private String nodeId;
 	private String arsId;
 	private String name;
 	private double x;
 	private double y;
-	private Map<BusStation, Integer> nextSet;
-	private Set<Bus> buses;
+	private Map<BusStation, Integer> next;
 	private int sectionIndex;
 	
-	public Integer addNext(BusStation station, int cost) {
-		if(station == null)return 0;
-		if(nextSet == null)nextSet = new HashMap<BusStation, Integer>();
-		if(nextSet.containsKey(station)) {
-			int val = nextSet.get(station);
-			cost = Math.min(cost, val);
+	private int sectionRow;
+	private int sectionCol;
+	
+	public void addNext(BusStation station, int cost) {
+		if(station == null)return;
+		if(next == null)next = new HashMap<BusStation, Integer>();
+		if(next.containsKey(station)) {
+			cost = Math.min(cost, next.get(station));
 		}
-		return nextSet.put(station, cost);
+		next.put(station, cost);
 	}
 	public Set<Entry<BusStation, Integer>> getNextEntry() {
-		return nextSet.entrySet();
+		return next.entrySet();
 	}
 	public boolean unusedStation() {
 		return name.contains("(가상)") || name.contains("(경유)");
 	}
 	
-	public void addBus(Bus b) {
-		if(b==null)return;
-		
-		if(buses == null) {
-			buses = new HashSet<Bus>();
-		}
-		buses.add(b);
-	}
-	public boolean existBus(Bus b) {
-		return buses.contains(b);
-	}
 }

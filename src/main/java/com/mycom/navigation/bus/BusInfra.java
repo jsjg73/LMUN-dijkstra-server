@@ -8,14 +8,18 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import com.mycom.navigation.bus.dto.Bus;
 import com.mycom.navigation.bus.dto.BusStation;
 import com.mycom.navigation.bus.dto.Edge;
 import com.mycom.navigation.bus.reader.BusInfraReader;
+import com.mycom.navigation.bus.section.BusSection;
+import com.mycom.navigation.bus.section.RC;
 import com.mycom.navigation.bus.writer.BusInfraTxtWriter;
 import com.mycompany.myapp.naver.Distance;
 
@@ -47,22 +51,17 @@ public class BusInfra {
 	private Map<String, BusStation> busStationTbl = new HashMap<String, BusStation>();
 	private Set<Edge> edgeSet = new HashSet<Edge>();
 	
-	private Set<BusStation>[] sections;
-	private double minX = 999;
-	private double minY = 999;
-	private double maxX = 0;
-	private double maxY = 0;
-	private int row,col;
+	private BusSection section;
 	
-	
-	
-	public BusInfra (BusInfraReader reader, int row, int col) {
-		// 버스 인프라 생성
-		reader.readBusInfra(this);
-		this.row = row;
-		this.col = col;
+	public BusInfra (int row, int col) {
+		section = new BusSection(row, col);
 	}
 	
+	// 버스 인프라 구축
+	public void constructInfra(BusInfraReader reader) {
+		reader.readBusInfra(this);
+	}
+	 
 	@Getter(AccessLevel.NONE)
 	@Setter(AccessLevel.NONE)
 	private BusStation preStation;
@@ -86,28 +85,22 @@ public class BusInfra {
 		
 		if((station = containsBusStation(infs[NODE_ID]))==null) {
 			station = BusStation.builder()
-										.idx(stationSize())
+										.idx(busStationTbl.size())
 										.nodeId(infs[NODE_ID])
 										.arsId(infs[ARS_ID])
-										.name(infs[STATION_NM])
+								 		.name(infs[STATION_NM])
 										.x(parseDouble(infs[X]))
 										.y(parseDouble(infs[Y]))
 										.build();
 			putBusStation(station);
-			minX=Math.min(minX, station.getX());
-			minY=Math.min(minY, station.getY());
-			maxX=Math.max(maxX, station.getX());
-			maxY=Math.max(maxY, station.getY());
+			section.minMaxXY(station);
 		}
-		
-		// 버스 추가
-		station.addBus(bus);
 		
 		// 인접 정류장 추가
 		if("1".equals(infs[ORDER])) {
 			preStation = station;
 		}else if(station.unusedStation()){//가상 정류장
-			val+=9;
+			val+=3;
 		}else{
 			preStation.addNext(station, val);
 			
@@ -135,70 +128,25 @@ public class BusInfra {
 		return Double.parseDouble(v);
 	}
 	
-	
-	double XUnit;
-	double YUnit;
-	public void dividingIntoArea() throws IOException {
-		if(busStationTbl == null) {
-			throw new IllegalStateException("모든 버스 정류장 정보가 필요합니다.");
+	public BusStation[] stationArray() {
+		BusStation[] bsArr = new BusStation[busStationTbl.size()];
+		for(Map.Entry<String, BusStation> ent : busStationTbl.entrySet()) {
+			bsArr[ent.getValue().getIdx()]=ent.getValue();
 		}
-		if(maxY==0 || maxX==0 ||minX==999|| minY==999) {
-			throw new IllegalStateException("경위도의 영역 한계값 설정이 필요합니다.");
-		}
-		
-		XUnit = ((maxX-minX)/500); // 0.0011009615529999905
-		YUnit = ((maxY-minY)/500); // 0.0016079761373999873
-
-		sections = new HashSet[(row+2)*(col+2)];
-		
-		for(Map.Entry<String , BusStation> ent : busStationTbl.entrySet()) {
-			BusStation bs = ent.getValue();
-			int sectionIdx = calSectionIndex(bs.getX(), bs.getY());
-			if(sections[sectionIdx] == null) {
-				sections[sectionIdx] = new HashSet<BusStation>();
-			}
-			sections[sectionIdx].add(bs);
-			bs.setSectionIndex(sectionIdx);
-		}
-	}
-	public int calSectionIndex(double x, double y) {
-		
-		int a = cvtX2R(x);
-		int b = cvtY2C(y);
-		
-		return convertRC2Idx(a, b);
+		return bsArr;
 	}
 	
-	public int convertRC2Idx(int r, int c) {
-		return c*col+r+1;
+	public void dividingIntoArea() {
+		section.dividingIntoArea(busStationTbl);
 	}
-	public int[] convertIdx2RC(int idx) {
-		int r = (idx-1)%col;
-		int c = (idx-1)/col;
-		return new int[] {r,c};
+	public Set<BusStation> arrounStations(double x, double y){
+		return section.arrounStations(x, y);
 	}
-	public int cvtX2R(double x) {
-		return (int)( (x-minX)/XUnit );
+	public Set<BusStation> stationsInSection(int r, int c){
+		return section.stationsInSection(r,c);
 	}
-	public int cvtY2C(double y) {
-		return (int)( (y-minY)/YUnit );
-	}
-	public boolean existStionInSection(int r, int c) {
-		Set<BusStation> section = busStaionsInSection(r, c);
-		if(section == null)return false;
-		for(BusStation bs : section) {
-			if(bs.unusedStation())continue;
-			return true;
-		}
-		return false;
-	}
-	public Set<BusStation> busStaionsInSection(int r, int c){
-		return sections[convertRC2Idx(r, c)];
-	}
-	public Set<BusStation> busStaionsInSection(int sectionIdx){
-		return sections[sectionIdx];
-	}
-	public int stationSize() {
-		return busStationTbl.size();
+	
+	public Set<BusStation>[][] getSectionArray(){
+		return section.getSections();
 	}
 }
