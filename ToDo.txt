@@ -28,7 +28,26 @@ c-2 : 결과 확인 용 출력 화면()
 	c-1 완료
 	다음 작업 : 장거리 경로 테스트.(String re = navi.navigate(126.8605239274, 37.5528647439, 127.0456374655,	37.6887853785);)
 			'(가상)' 제거
-
+	
+	2021/06/14
+	c-2 : 결과 출력 화면 진행
+	thymeleaf 사용 예정, 공식 문서 읽어보기
+	spring boot 생성
+	index.html 생성 :  naver web dynamic api 동작 체크
+	다음 할 일 : 통신 샘플 만들기(
+				0. thymeleaf 문서 읽기 
+				https://www.thymeleaf.org/doc/tutorials/2.1/thymeleafspring.html
+				https://spring.io/guides/gs/serving-web-content/
+				1. 클라이언트, 서버에 필요한 페이지 계산
+				2. 테스트 입력 및 기대값 준비
+				3. 코드 작성)
+	2021/06/15
+	ajax post 통신 에러로 고생 : https://denodo1.tistory.com/322
+	contentType과 @ResponseBody의 spec 불일치로 resolving 에러
+	1. ajax data를 JSON.stringify 처리해줘야함.
+	2. Controller에서는 dto로 받아야함
+	
+	화면 출력 성공
 
 2021/06/05
 (우선순위 낮은 작업)

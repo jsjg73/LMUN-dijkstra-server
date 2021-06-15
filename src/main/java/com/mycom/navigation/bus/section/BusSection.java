@@ -25,10 +25,11 @@ public class BusSection {
 	
 	private double XUnit;
 	private double YUnit;
-	public void dividingIntoArea(Map<String, BusStation> busStationTbl) {
+	public void initialization(Map<String, BusStation> busStationTbl) {
 		if(busStationTbl == null) {
 			throw new IllegalStateException("모든 버스 정류장 정보가 필요합니다.");
 		}
+		updateMinMaxXY(busStationTbl);
 		int row = limitRC.getRow();
 		int col = limitRC.getCol();
 		XUnit = ((maxXY.getX() - minXY.getX())/row); // 0.0011009615529999905
@@ -48,7 +49,12 @@ public class BusSection {
 			bs.setSectionCol(c);
 		}
 	}
-	
+	private void updateMinMaxXY(Map<String, BusStation> busStationTbl) {
+		for(Map.Entry<String , BusStation> ent : busStationTbl.entrySet()) {
+			BusStation bs = ent.getValue();
+			minMaxXY(bs);
+		}
+	}
 	
 	
 	public Set<BusStation> arrounStations(double x, double y){

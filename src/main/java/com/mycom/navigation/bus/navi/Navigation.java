@@ -6,8 +6,8 @@ import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import com.mycom.navigation.bus.BusInfra;
 import com.mycom.navigation.bus.dto.BusStation;
+import com.mycom.navigation.bus.factory.BusInfra;
 
 public class Navigation {
 	int[] dr = {0,-1,-1,0,1,1,1,0,-1};
@@ -97,7 +97,7 @@ public class Navigation {
 		for(int i=list.size()-1; i>0; i--) {
 			BusStation from = list.get(i);
 			BusStation to = list.get(i-1);
-			re.add(from.getRealPath().get(to.getNodeId()));
+			re.add(from.getRealPathTbl().get(to.getNodeId()));
 		}
 		
 		

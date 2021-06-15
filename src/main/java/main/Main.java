@@ -3,7 +3,8 @@ package main;
 import java.io.IOException;
 import java.util.List;
 
-import com.mycom.navigation.bus.BusInfra;
+import com.mycom.navigation.bus.factory.BusInfra;
+import com.mycom.navigation.bus.factory.BusInfraFactory;
 import com.mycom.navigation.bus.navi.Navigation;
 import com.mycom.navigation.bus.reader.BusInfraReader;
 import com.mycom.navigation.bus.reader.BusInfraTxtReader;
@@ -12,13 +13,12 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		
 		// 버스 인프라 구축
-		BusInfra bif = new BusInfra(500, 500);
 		BusInfraReader bifReader = new BusInfraTxtReader();
-		bif.constructInfra(bifReader);
+		BusInfra bif = BusInfraFactory.construct(bifReader, 500, 500);
 		
 		// 버스 정류장 영역 구분 
 		// 500칸*500칸, (대략, 가로 140m * 세로 120m)
-		bif.dividingIntoArea();
+//		bif.dividingIntoArea();
 		
 		//edge data load
 		bif.loadRealPath(bifReader);

@@ -28,6 +28,10 @@ EdgeData :  naver api를 통해 미리 받아온 정류장 간의 real path
 산출물
 sectionImage.txt : sections[]에 저장된 정류장 정보를 row*col배열 형태로 출력, 해당 구역에 버스 정류장 갯수
 
+정류장 인접 리스트 정책
+key : 인접 정류장 인스턴스
+value : 이동 비용( )
+
 다익스트라 조건 정책
 정류장 내 환승 : +3
 정류장 외 환승 : +6

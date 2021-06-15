@@ -1,4 +1,4 @@
-package com.mycom.navigation.bus;
+package com.mycom.navigation.bus.factory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,14 +40,8 @@ public class BusInfra {
 	private Map<String, HashMap<String, String>> realPathData;
 	private BusSection section;
 	
-	public BusInfra (int row, int col) {
-		section = new BusSection(row, col);
-	}
-	
+	protected BusInfra () {	}
 	// 버스 인프라 구축
-	public void constructInfra(BusInfraReader reader) {
-		reader.readBusInfra(this);
-	}
 	 
 	@Getter(AccessLevel.NONE)
 	@Setter(AccessLevel.NONE)
@@ -56,47 +50,18 @@ public class BusInfra {
 	@Setter(AccessLevel.NONE)
 	private int val=1;
 	
-	public void extendInfra(String[] infs) {
-		Bus bus = busTbl.get(infs[BUS_ID]);
-		//버스 정보 추가
-		if(bus == null) {
-			bus = Bus.builder()
-					.id(infs[BUS_ID])
-					.name(infs[BUS_NM])
-					.build();
-			putBus(bus);
-		}
-		
-		//정류장 정보 추가
-		BusStation station=null;
-		
-		if((station = containsBusStation(infs[NODE_ID]))==null) {
-			station = BusStation.builder()
-										.idx(busStationTbl.size())
-										.nodeId(infs[NODE_ID])
-										.arsId(infs[ARS_ID])
-								 		.name(infs[STATION_NM])
-										.x(parseDouble(infs[X]))
-										.y(parseDouble(infs[Y]))
-										.build();
-			putBusStation(station);
-			section.minMaxXY(station);
-		}
-		
-		// 인접 정류장 추가
-		if("1".equals(infs[ORDER])) {
-			preStation = station;
-		}else if(station.unusedStation()){//가상 정류장
-			val+=3;
-		}else{
-			preStation.addNext(station, val);
-			
-//			"C:/workspace/practice/ReadExcelFile/Edges.txt"에 저장할 때 사용
-//			edgeSet.add(new Edge(preStation, station));
-			
-			preStation = station;
-			val =1;
-		}
+	public boolean hasBus(String id) {
+		return busTbl.get(id)!=null;
+	}
+	public boolean hasBusStation(String id) {
+		return busStationTbl.get(id)!=null;
+	}
+	public int busStaionSize() {
+		return busStationTbl.size();
+	}
+	
+	public BusStation getBusStation(String stationId) {
+		return busStationTbl.get(stationId);
 	}
 	
 	public void loadRealPath(BusInfraReader reader) {
@@ -116,15 +81,11 @@ public class BusInfra {
 	private BusStation containsBusStation(String stationId) {
 		return busStationTbl.get(stationId);
 	}
-	private void putBus(Bus bus) {
+	public void addBus(Bus bus) {
 		busTbl.put(bus.getId(), bus);
 	}
-	private void putBusStation(BusStation station) {
+	public void addBusStation(BusStation station) {
 		busStationTbl.put(station.getNodeId(), station);
-	}
-	
-	private double parseDouble(String v) {
-		return Double.parseDouble(v);
 	}
 	
 	public BusStation[] stationArray() {
@@ -135,9 +96,6 @@ public class BusInfra {
 		return bsArr;
 	}
 	
-	public void dividingIntoArea() {
-		section.dividingIntoArea(busStationTbl);
-	}
 	public Set<BusStation> arrounStations(double x, double y){
 		return section.arrounStations(x, y);
 	}

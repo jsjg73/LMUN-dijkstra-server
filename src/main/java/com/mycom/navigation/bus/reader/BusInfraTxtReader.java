@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mycom.navigation.bus.BusInfra;
+import com.mycom.navigation.bus.factory.BusInfra;
 /*
  * BusInfra 구축하기 위해 서울시 버스 노선 및 정류장 정보 텍스트 파일 읽기.
  * 
@@ -19,22 +19,23 @@ import com.mycom.navigation.bus.BusInfra;
  * */
 public class BusInfraTxtReader implements BusInfraReader{
 
-	public void readBusInfra(BusInfra bif) {
+	public List<String[]> readBusStopByRoute() {
+		List<String[]> busStopByRoute = new ArrayList<String[]>();
 		try {
-			FileInputStream file = new FileInputStream("C:/workspace/practice/ReadExcelFile/Stations.txt");
-			BufferedReader br = new BufferedReader(new InputStreamReader(file));
+			FileInputStream busStopByRouteFile = new FileInputStream("C:/workspace/practice/ReadExcelFile/Stations.txt");
+			BufferedReader br = new BufferedReader(new InputStreamReader(busStopByRouteFile));
 			String line = null;
 			while((line = br.readLine())!= null) { // EoF
 				String[] infs = line.split("\t");
-				bif.extendInfra(infs);
+				busStopByRoute.add(infs);
 			}
-			file.close();
+			busStopByRouteFile.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		return busStopByRoute;
 	}
 	public List<String[]> loadRealPath() {
 		FileInputStream file;

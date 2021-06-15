@@ -13,9 +13,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.mycom.navigation.bus.BusInfra;
 import com.mycom.navigation.bus.dto.BusStation;
 import com.mycom.navigation.bus.dto.Edge;
+import com.mycom.navigation.bus.factory.BusInfra;
 import com.mycompany.myapp.naver.NPath;
 import com.mycompany.myapp.naver.NaverAPI;
 import com.mycompany.myapp.naver.NaverJsonParsing;
