@@ -1,7 +1,6 @@
 package com.mycom.navigation.bus.dto;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -26,7 +25,6 @@ public class BusStation {
 	
 	private int sectionRow;
 	private int sectionCol;
-	
 	public void addNext(BusStation station, int cost) {
 		if(station == null)return;
 		if(next == null)next = new HashMap<BusStation, Integer>();
@@ -45,4 +43,19 @@ public class BusStation {
 		if(realPathTbl == null)realPathTbl= new HashMap<String, String>();
 		realPathTbl.put(stationNodeId, path);
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) return true;
+		if(obj == null  || getClass() != obj.getClass())return false;
+		
+		BusStation e = (BusStation)obj;
+		
+		return nodeId.equals(e.getNodeId());
+	}
+	
+	@Override
+    public int hashCode() {
+		return nodeId.hashCode();
+    }
 }

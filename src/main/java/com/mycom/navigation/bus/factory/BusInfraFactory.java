@@ -22,6 +22,7 @@ public class BusInfraFactory {
 	
 	public static BusInfra construct(BusInfraReader reader, int sectionRow, int sectionCol) {
 		List<String[]> busStopByRoute = reader.readBusStopByRoute();
+		
 		int val =1;
 		BusStation previousStation = null;
 		for(String[] record : busStopByRoute) {

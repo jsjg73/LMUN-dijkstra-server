@@ -95,9 +95,10 @@ public class Navigation {
 		
 		List<String> re = new ArrayList<String>();
 		for(int i=list.size()-1; i>0; i--) {
-			BusStation from = list.get(i);
-			BusStation to = list.get(i-1);
-			re.add(from.getRealPathTbl().get(to.getNodeId()));
+			BusStation pre = list.get(i);
+			BusStation next = list.get(i-1);
+			String realPath = bif.findRealpath(pre, next);
+			re.add(realPath);
 		}
 		
 		
