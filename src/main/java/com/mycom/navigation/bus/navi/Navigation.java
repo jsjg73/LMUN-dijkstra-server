@@ -6,7 +6,8 @@ import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import com.mycom.navigation.bus.dto.BusStation;
+import com.mycom.navigation.bus.dto.BusStop;
+import com.mycom.navigation.bus.dto.Edge;
 import com.mycom.navigation.bus.factory.BusInfra;
 
 public class Navigation {
@@ -21,42 +22,43 @@ public class Navigation {
 	}
 	
 	public List<String> navigate(double sx, double sy, double ex, double ey) {
-		Set<BusStation> startStaions = bif.arrounStations(sx, sy);
-		Set<BusStation> endStations = bif.arrounStations(ex, ey);
+		Set<BusStop> startStaions = bif.arrounStops(sx, sy);
+		Set<BusStop> endStops = bif.arrounStops(ex, ey);
 		
-		BusStation[] bsArr = bif.stationArray();
+		BusStop[] bsArr = bif.stopArray();
 		
 		boolean[] v = new boolean[bsArr.length];
 		int[] v_cost = new int[v.length]; // 비용, 직전위치
-		BusStation[] v_before = new BusStation[v.length];
+		BusStop[] v_before = new BusStop[v.length];
 		
 		PriorityQueue<Dijk> pq = new PriorityQueue<Dijk>();
-		for(BusStation bs : startStaions) {
+		for(BusStop bs : startStaions) {
 			pq.offer(new Dijk(0,bs,null));
 		}
 		
-		BusStation endpoint = null;
+		BusStop endpoint = null;
 		
 		while(!pq.isEmpty()){
 			Dijk d = pq.poll();
-			BusStation curr = d.curr;
-			BusStation before = d.before;
+			BusStop curr = d.curr;
+			BusStop before = d.before;
 			int currIdx = curr.getIdx();
 			if(v[currIdx])continue;
 
 			v[currIdx]=true;
 			v_cost[currIdx] = d.cost ;
 			v_before[currIdx] = before ;
-			if(endStations.contains(curr)) {
+			if(endStops.contains(curr)) {
 				endpoint = curr;
 				break;
 			}
 			// 버스로 정류장 이동.
-			if(curr.getNext()!=null) {
+			if(curr.getNextStops()!=null) {
 				
-				for(Entry<BusStation,Integer> ent : curr.getNextEntry()) {
-					BusStation nextBs = ent.getKey();
-					int value = ent.getValue();
+				for(Entry<BusStop,Edge> ent : curr.getNextEntry()) {
+					BusStop nextBs = ent.getKey();
+					Edge e = ent.getValue();
+					int value = e.getCost();
 					
 					//방문 기록 없는 정류장
 					if(!v[nextBs.getIdx()]) {
@@ -70,10 +72,10 @@ public class Navigation {
 			for(int i=0; i<=8; i++) {
 				int mr = r + dr[i];
 				int mc = c + dc[i];
-				Set<BusStation> stations = bif.stationsInSection(mr, mc);
-				if(stations != null) {
-					for(BusStation b : stations) {
-						if(b.unusedStation())continue; // 경유 또는 가상 정류장
+				Set<BusStop> stops = bif.stopsInSection(mr, mc);
+				if(stops != null) {
+					for(BusStop b : stops) {
+						if(b.unusedStop())continue; // 경유 또는 가상 정류장
 						if(!v[b.getIdx()]) {
 							// 정류장 외 환승 +6
 							pq.offer(new Dijk(d.cost+3, curr, b));
@@ -85,7 +87,7 @@ public class Navigation {
 		
 		if(endpoint == null) return null;
 		
-		List<BusStation> list = new ArrayList<BusStation>();
+		List<BusStop> list = new ArrayList<BusStop>();
 		int idx = endpoint.getIdx();
 		while(true) {
 			list.add(bsArr[idx]);
@@ -95,9 +97,9 @@ public class Navigation {
 		
 		List<String> re = new ArrayList<String>();
 		for(int i=list.size()-1; i>0; i--) {
-			BusStation pre = list.get(i);
-			BusStation next = list.get(i-1);
-			String realPath = bif.findRealpath(pre, next);
+			BusStop pre = list.get(i);
+			BusStop next = list.get(i-1);
+			String realPath = pre.findRealpath(next);
 			re.add(realPath);
 		}
 		
@@ -106,10 +108,10 @@ public class Navigation {
 	}
 	class Dijk implements Comparable<Dijk>{
 		int cost;
-		BusStation curr;
-		BusStation before;
+		BusStop curr;
+		BusStop before;
 		
-		public Dijk(int cost, BusStation curr, BusStation before) {
+		public Dijk(int cost, BusStop curr, BusStop before) {
 			this.cost = cost;
 			this.curr = curr;
 			this.before = before;

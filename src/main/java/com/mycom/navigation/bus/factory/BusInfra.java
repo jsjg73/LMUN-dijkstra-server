@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections4.map.MultiKeyMap;
+
 import com.mycom.navigation.bus.dto.Bus;
-import com.mycom.navigation.bus.dto.BusStation;
+import com.mycom.navigation.bus.dto.BusStop;
 import com.mycom.navigation.bus.reader.BusInfraReader;
 import com.mycom.navigation.bus.section.BusSection;
 
@@ -30,9 +32,7 @@ import lombok.Setter;
 public class BusInfra {
 	
 	private Map<String, Bus> busTbl = new HashMap<String, Bus>();
-	private Map<String, BusStation> busStationTbl = new HashMap<String, BusStation>();
-//	private Set<Edge> edgeSet = new HashSet<Edge>();
-	private Map<String, HashMap<String, String>> realPathArchive;
+	private Map<String, BusStop> busStopTbl = new HashMap<String, BusStop>();
 	private BusSection section;
 	
 	protected BusInfra () {	}
@@ -41,53 +41,39 @@ public class BusInfra {
 	public boolean hasBus(String id) {
 		return busTbl.get(id)!=null;
 	}
-	public boolean hasBusStation(String id) {
-		return busStationTbl.get(id)!=null;
+	public boolean hasBusStop(String id) {
+		return busStopTbl.get(id)!=null;
 	}
 	public int busStaionSize() {
-		return busStationTbl.size();
+		return busStopTbl.size();
 	}
 	
-	public BusStation getBusStation(String stationId) {
-		return busStationTbl.get(stationId);
-	}
-	public String findRealpath(BusStation pre, BusStation next) {
-		return realPathArchive.get(pre).get(next);
-	}
-	public void loadRealPath(BusInfraReader reader) {
-		realPathArchive = new HashMap<String, HashMap<String,String>>(); 
-		
-		List<String[]> listRealPath = reader.loadRealPath();
-		for(String[] arr : listRealPath) {
-			String from = arr[0];
-			String to = arr[1];
-			BusStation f = busStationTbl.get(from);
-			f.addRealPath(to, arr[2]);
-		}
+	public BusStop getBusStop(String stopId) {
+		return busStopTbl.get(stopId);
 	}
 	public void addBus(Bus bus) {
 		busTbl.put(bus.getId(), bus);
 	}
-	public void addBusStation(BusStation station) {
-		busStationTbl.put(station.getNodeId(), station);
+	public void addBusStop(BusStop stop) {
+		busStopTbl.put(stop.getNodeId(), stop);
 	}
 	
-	public BusStation[] stationArray() {
-		BusStation[] bsArr = new BusStation[busStationTbl.size()];
-		for(Map.Entry<String, BusStation> ent : busStationTbl.entrySet()) {
+	public BusStop[] stopArray() {
+		BusStop[] bsArr = new BusStop[busStopTbl.size()];
+		for(Map.Entry<String, BusStop> ent : busStopTbl.entrySet()) {
 			bsArr[ent.getValue().getIdx()]=ent.getValue();
 		}
 		return bsArr;
 	}
 	
-	public Set<BusStation> arrounStations(double x, double y){
-		return section.arrounStations(x, y);
+	public Set<BusStop> arrounStops(double x, double y){
+		return section.arrounStops(x, y);
 	}
-	public Set<BusStation> stationsInSection(int r, int c){
-		return section.stationsInSection(r,c);
+	public Set<BusStop> stopsInSection(int r, int c){
+		return section.stopsInSection(r,c);
 	}
 	
-	public Set<BusStation>[][] getSectionArray(){
+	public Set<BusStop>[][] getSectionArray(){
 		return section.getSections();
 	}
 }

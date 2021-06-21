@@ -2,8 +2,10 @@ package com.mycom.navigation.bus.factory;
 
 import java.util.List;
 
+import org.apache.commons.collections4.map.MultiKeyMap;
+
 import com.mycom.navigation.bus.dto.Bus;
-import com.mycom.navigation.bus.dto.BusStation;
+import com.mycom.navigation.bus.dto.BusStop;
 import com.mycom.navigation.bus.reader.BusInfraReader;
 import com.mycom.navigation.bus.section.BusSection;
 
@@ -22,23 +24,36 @@ public class BusInfraFactory {
 	
 	public static BusInfra construct(BusInfraReader reader, int sectionRow, int sectionCol) {
 		List<String[]> busStopByRoute = reader.readBusStopByRoute();
+		MultiKeyMap<String, String> realPathsBetweenStops = reader.loadRealPath();
+		// pre - next 로 검색할 수 있도록 자료구조 수정
 		
 		int val =1;
-		BusStation previousStation = null;
+		String realPath = null ;
+		BusStop previousStop = null;
 		for(String[] record : busStopByRoute) {
 			addBus(record);
-			addBusStation(record);
+			addBusStop(record);
 			
 			//connect
-			BusStation currentStation = busInfra.getBusStation(record[NODE_ID]);
+			BusStop currentStop = busInfra.getBusStop(record[NODE_ID]);
 			if("1".equals(record[ORDER])) {
-				previousStation = currentStation;
-			}else if(currentStation.unusedStation()){
-				val+=3;
+				previousStop = currentStop;
 			}else {
-				previousStation.addNext(currentStation, val);
-				previousStation = currentStation;
-				val = 1;
+				String currRealPath =realPathsBetweenStops.get(previousStop.getNodeId(), currentStop.getNodeId());
+				if(realPath ==  null) {
+					realPath = currRealPath;
+				}else {
+					realPath +=","+ currRealPath;
+				}
+				if(currentStop.unusedStop()){
+					val+=3;
+				}else {
+					// 경로 추가 
+					previousStop.addNextStop(currentStop, val, realPath);
+					previousStop = currentStop;
+					val = 1;
+					realPath = null;
+				}
 			}
 		}
 		initBusSection(sectionRow, sectionCol);
@@ -46,7 +61,7 @@ public class BusInfraFactory {
 	}
 	private static void initBusSection(int sectionRow, int sectionCol) {
 		BusSection section = new BusSection(sectionRow, sectionCol);
-		section.initialization(busInfra.getBusStationTbl());
+		section.initialization(busInfra.getBusStopTbl());
 		busInfra.setSection(section);
 	}
 	
@@ -63,13 +78,13 @@ public class BusInfraFactory {
 			busInfra.addBus(bus);
 		}
 	}
-	private static boolean addBusStation(String[] record) {
-		String stationId = record[NODE_ID];
-		if(stationId == null)throw new IllegalArgumentException("버스정류장 아이디는 null이 될 수 없습니다.");
+	private static boolean addBusStop(String[] record) {
+		String stopId = record[NODE_ID];
+		if(stopId == null)throw new IllegalArgumentException("버스정류장 아이디는 null이 될 수 없습니다.");
 		
-		BusStation station=null;
-		if(!busInfra.hasBusStation(stationId)) {
-			station = BusStation.builder()
+		BusStop stop=null;
+		if(!busInfra.hasBusStop(stopId)) {
+			stop = BusStop.builder()
 					.idx(busInfra.busStaionSize())
 					.nodeId(record[NODE_ID])
 					.arsId(record[ARS_ID])
@@ -77,7 +92,7 @@ public class BusInfraFactory {
 					.x(parseDouble(record[X]))
 					.y(parseDouble(record[Y]))
 					.build();
-			busInfra.addBusStation(station);
+			busInfra.addBusStop(stop);
 		}
 		return false;
 	}
