@@ -53,6 +53,6 @@ public class BusInfraTxtReader implements BusInfraReader{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return map;
 	}
 }
