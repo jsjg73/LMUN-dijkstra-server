@@ -2,9 +2,10 @@ package com.mycom.navigation.bus.reader;
 
 import java.util.List;
 
-import com.mycom.navigation.bus.factory.BusInfra;
+import org.apache.commons.collections4.map.MultiKeyMap;
+
 
 public interface BusInfraReader {
 	public List<String[]> readBusStopByRoute();
-	public List<String[]> loadRealPath();
+	public MultiKeyMap<String, String> loadRealPath();
 }

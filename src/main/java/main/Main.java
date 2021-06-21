@@ -16,14 +16,6 @@ public class Main {
 		BusInfraReader bifReader = new BusInfraTxtReader();
 		BusInfra bif = BusInfraFactory.construct(bifReader, 500, 500);
 		
-		// 버스 정류장 영역 구분 
-		// 500칸*500칸, (대략, 가로 140m * 세로 120m)
-//		bif.dividingIntoArea();
-		
-		//edge data load
-		bif.loadRealPath(bifReader);
-		
-		
 		//다익스트라
 		Navigation navi = new Navigation(bif);
 		//100100286	5712	34	115000006	16006	등촌중학교 백석초등학교	126.8605239274	37.5528647439

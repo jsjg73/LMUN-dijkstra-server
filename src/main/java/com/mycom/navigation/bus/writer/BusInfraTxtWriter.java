@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.mycom.navigation.bus.dto.BusStation;
+import com.mycom.navigation.bus.dto.BusStop;
 import com.mycom.navigation.bus.dto.Edge;
 import com.mycom.navigation.bus.factory.BusInfra;
 import com.mycompany.myapp.naver.NPath;
@@ -46,21 +46,21 @@ public class BusInfraTxtWriter {
 //		}
 //		
 //	}
-	
-	public void writePath(int amount, Map<String, BusStation> busStationTbl) {
+
+	public void writePath(int amount, Map<String, BusStop> busStopTbl) {
 		try {
 			FileInputStream file = new FileInputStream("C:/workspace/practice/ReadExcelFile/Edges.txt");
 			BufferedReader br = new BufferedReader(new InputStreamReader(file));
 			ArrayList<String> list = new ArrayList<String>();
 			String line = null;
-			while((line = br.readLine())!= null) { // EoF
+			while ((line = br.readLine()) != null) { // EoF
 				list.add(line);
 			}
 			br.close();
 			file.close();
-			
+
 			FileOutputStream fos1 = new FileOutputStream("C:/workspace/practice/ReadExcelFile/Edges.txt");
-			FileOutputStream fos2 = new FileOutputStream("C:/workspace/practice/ReadExcelFile/EdgeData.txt",true);
+			FileOutputStream fos2 = new FileOutputStream("C:/workspace/practice/ReadExcelFile/EdgeData.txt", true);
 			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos1));
 			BufferedWriter bw2 = new BufferedWriter(new OutputStreamWriter(fos2));
 //			NaverAPI naver = new NaverAPI();
@@ -68,65 +68,64 @@ public class BusInfraTxtWriter {
 //			api 요청
 //			data 핸들링
 			NaverAPI naver = new NaverAPI();
-			
-			for(String li : list) {
-				if(amount==0) {
-					bw.write(li+"\n");
+
+			for (String li : list) {
+				if (amount == 0) {
+					bw.write(li + "\n");
 					continue;
 				}
 				String[] info = li.split("\t");
-				
+
 				// 경로 받아온 edge
-				if("1".equals(info[0])) {
-					bw.write(li+"\n");
-					
-				// 경로 안 받아온 edgs
-				}else {
+				if ("1".equals(info[0])) {
+					bw.write(li + "\n");
+
+					// 경로 안 받아온 edgs
+				} else {
 					amount--;
 					// api
-					
+
 					// 출발 도착 정류소 찾기
-					BusStation from = busStationTbl.get(info[1]);
-					BusStation to = busStationTbl.get(info[2]);
-					
-					//api 요청 재료 세팅
+					BusStop from = busStopTbl.get(info[1]);
+					BusStop to = busStopTbl.get(info[2]);
+
+					// api 요청 재료 세팅
 					NPath np = new NPath();
-					np.setEx(to.getX()+"");
-					np.setEy(to.getY()+"");
-					np.setSx(from.getX()+"");
-					np.setSy(from.getY()+"");
-					
-					//api 요청
+					np.setEx(to.getX() + "");
+					np.setEy(to.getY() + "");
+					np.setSx(from.getX() + "");
+					np.setSy(from.getY() + "");
+
+					// api 요청
 					naver.getPath(np);
-					
+
 					// path배열만 추출
 					NaverJsonParsing njp = new NaverJsonParsing();
 					njp.polyPathParsing(np);
-					
-					
+
 					String data = "null";
-					if(np.getPath()!=null) {
+					if (np.getPath() != null) {
 						data = np.getPath().toString();
-					}else {
+					} else {
 						data = np.getStMsg();
 					}
-					
+
 					bw2.write(info[1]);
 					bw2.write("\t");
 					bw2.write(info[2]);
 					bw2.write("\t");
-					bw2.write(data +"\n");
-					
+					bw2.write(data + "\n");
+
 					bw.write("1");
-					bw.write(li.substring(1)+"\n");
-					System.out.println(amount +"번 완료 ::"+ np.getStCode() + " :: " + np.getStMsg());
+					bw.write(li.substring(1) + "\n");
+					System.out.println(amount + "번 완료 ::" + np.getStCode() + " :: " + np.getStMsg());
 				}
 			}
 			bw2.flush();
 			bw2.close();
 			bw.flush();
 			bw.close();
-			if(amount>0) {
+			if (amount > 0) {
 				System.out.println("all path are searched");
 			}
 		} catch (FileNotFoundException e) {
@@ -135,17 +134,18 @@ public class BusInfraTxtWriter {
 			e.printStackTrace();
 		}
 	}
+
 	public void writeSectionImage(BusInfra bif) throws IOException {
-		Set<BusStation>[][] sections = bif.getSectionArray();
+		Set<BusStop>[][] sections = bif.getSectionArray();
 		FileOutputStream file = new FileOutputStream("C:/workspace/practice/ReadExcelFile/sectionImage.txt");
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(file));
-		for(int i=0; i<sections.length; i++) {
-			for(int j=0; j<sections[i].length+2; j++) {
-				if(sections[j+i*500]!=null) {
-					int size= sections[i][j].size();
-					String s = size+",";
+		for (int i = 0; i < sections.length; i++) {
+			for (int j = 0; j < sections[i].length + 2; j++) {
+				if (sections[j + i * 500] != null) {
+					int size = sections[i][j].size();
+					String s = size + ",";
 					bw.write(s);
-				}else {
+				} else {
 					bw.write("0,");
 				}
 			}

@@ -8,7 +8,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mycom.navigation.bus.factory.BusInfra;
+import org.apache.commons.collections4.map.MultiKeyMap;
+
 /*
  * BusInfra 구축하기 위해 서울시 버스 노선 및 정류장 정보 텍스트 파일 읽기.
  * 
@@ -37,21 +38,21 @@ public class BusInfraTxtReader implements BusInfraReader{
 		}
 		return busStopByRoute;
 	}
-	public List<String[]> loadRealPath() {
+	public MultiKeyMap<String, String> loadRealPath() {
 		FileInputStream file;
-		List<String[]> list = new ArrayList<String[]>();
+		 MultiKeyMap<String, String> map = new MultiKeyMap<String, String>();
 		try {
 			file = new FileInputStream("C:/workspace/practice/ReadExcelFile/EdgeData.txt");
 			BufferedReader br = new BufferedReader(new InputStreamReader(file));
 			String line = null;
 			while((line = br.readLine())!= null) { // EoF
 				String[] infs = line.split("\t");
-				list.add(infs);
+				map.put(infs[0], infs[1], infs[2]);
 			}
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return list;
+		return null;
 	}
 }
