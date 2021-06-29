@@ -6,6 +6,6 @@ import org.apache.commons.collections4.map.MultiKeyMap;
 
 
 public interface BusInfraReader {
-	public List<String[]> readBusStopByRoute();
+	public List<String[]> readBusNodeByRoute();
 	public MultiKeyMap<String, String> loadRealPath();
 }
