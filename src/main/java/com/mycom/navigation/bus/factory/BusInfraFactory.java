@@ -57,6 +57,8 @@ public class BusInfraFactory {
 			}
 		}
 		initBusSection(sectionRow, sectionCol);
+		//TODO 걸어서 환승하는 경우 추가.
+		hh
 		return busInfra;
 	}
 	private static void initBusSection(int sectionRow, int sectionCol) {
@@ -93,6 +95,7 @@ public class BusInfraFactory {
 					.y(parseDouble(record[Y]))
 					.build();
 			busInfra.addBusStop(stop);
+			return true;
 		}
 		return false;
 	}
