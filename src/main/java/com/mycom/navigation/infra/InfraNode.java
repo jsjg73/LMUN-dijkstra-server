@@ -1,6 +1,7 @@
 
 package com.mycom.navigation.infra;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -9,15 +10,36 @@ import lombok.Setter;
 @Getter
 @Setter
 public class InfraNode {
-	private int idx;
-	private String nodeId;
-	private boolean disable;
-	private Map<InfraNode, InfraEdge> nexts;
-	
-	public int getIdx() {
-		return idx;
+	protected int idx;
+	protected String nodeId;
+	protected Map<InfraNode, InfraEdge> nexts;
+	protected boolean enable = true;
+	protected double x;
+	protected double y;
+	public InfraNode(int idx, String nodeId) {
+		super();
+		this.idx = idx;
+		this.nodeId = nodeId;
 	}
-
+	
+	public void addNextNode(InfraNode node, int cost, String realPath) {
+		if(node == null)return;
+		if(nexts == null)nexts = new HashMap<InfraNode, InfraEdge>();
+		InfraEdge edge = nexts.get(node);
+		if(edge == null) {
+			edge = new InfraEdge(cost, realPath);
+			nexts.put(node, edge);
+		}else {
+			if(edge.getCost() > cost) {
+				edge.setCost(cost);
+				edge.setRealPath(realPath);
+			}
+		}
+	}
+	
+	public String findRealpath(InfraNode next) {
+		return nexts.get(next).getRealPath();
+	}
 	public Iterator<Map.Entry<InfraNode, InfraEdge>> nextsIterator() {
 		if(nexts == null)return null;
 		return nexts.entrySet().iterator();
@@ -26,7 +48,9 @@ public class InfraNode {
 	public String getRealPathTo(InfraNode next) {
 		return nexts.get(next).getRealPath();
 	};
-	
+	public boolean connected(InfraNode node) {
+		return nexts != null && nexts.containsKey(node);
+	}
 	@Override
 	public boolean equals(Object obj) {
 		if(this == obj) return true;
@@ -41,4 +65,5 @@ public class InfraNode {
     public int hashCode() {
 		return nodeId.hashCode();
     }
+
 }
