@@ -1,18 +1,15 @@
 package com.mycom.navigation.bus.factory;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections4.map.MultiKeyMap;
-
 import com.mycom.navigation.bus.dto.Bus;
-import com.mycom.navigation.bus.dto.BusStop;
-import com.mycom.navigation.bus.reader.BusInfraReader;
 import com.mycom.navigation.bus.section.BusSection;
+import com.mycom.navigation.infra.InfraNode;
+import com.mycom.navigation.infra.Infrastructure;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,51 +26,37 @@ import lombok.Setter;
  * */
 @Getter
 @Setter
-public class BusInfra {
+public class BusInfra extends Infrastructure{
 	
 	private Map<String, Bus> busTbl = new HashMap<String, Bus>();
-	private Map<String, BusStop> busStopTbl = new HashMap<String, BusStop>();
 	private BusSection section;
-	
+	private InfraNode[] nodesByIdx;
 	protected BusInfra () {	}
-	// 버스 인프라 구축
-	 
+	
+	@Override
+	public Set<InfraNode> nodesNearby(double x, double y) {
+		return section.nodesNearby(x, y);
+	}
+	
+	@Override
+	public InfraNode getNodeByIndex(int idx) {
+		return nodesByIdx[idx];
+	}
+	
+	public void createIndexingStructure() {
+		if(nodesByIdx != null)return;
+		nodesByIdx = new InfraNode[nodeSize];
+		
+	}
+	
 	public boolean hasBus(String id) {
 		return busTbl.get(id)!=null;
 	}
-	public boolean hasBusStop(String id) {
-		return busStopTbl.get(id)!=null;
-	}
-	public int busStaionSize() {
-		return busStopTbl.size();
-	}
-	
-	public BusStop getBusStop(String stopId) {
-		return busStopTbl.get(stopId);
+	public boolean hasBusNode(String id) {
+		return nodes.get(id)!=null;
 	}
 	public void addBus(Bus bus) {
 		busTbl.put(bus.getId(), bus);
 	}
-	public void addBusStop(BusStop stop) {
-		busStopTbl.put(stop.getNodeId(), stop);
-	}
 	
-	public BusStop[] stopArray() {
-		BusStop[] bsArr = new BusStop[busStopTbl.size()];
-		for(Map.Entry<String, BusStop> ent : busStopTbl.entrySet()) {
-			bsArr[ent.getValue().getIdx()]=ent.getValue();
-		}
-		return bsArr;
-	}
-	
-	public Set<BusStop> arrounStops(double x, double y){
-		return section.arrounStops(x, y);
-	}
-	public Set<BusStop> stopsInSection(int r, int c){
-		return section.stopsInSection(r,c);
-	}
-	
-	public Set<BusStop>[][] getSectionArray(){
-		return section.getSections();
-	}
 }
