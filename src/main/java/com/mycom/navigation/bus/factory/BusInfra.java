@@ -27,11 +27,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BusInfra extends Infrastructure{
+	private static BusInfra instance = new BusInfra();
+	protected static BusInfra create() {
+		return instance;
+	}
 	
 	private Map<String, Bus> busTbl = new HashMap<String, Bus>();
 	private BusSection section;
 	private InfraNode[] nodesByIdx;
-	protected BusInfra () {	}
+	private BusInfra () {}
 	
 	@Override
 	public Set<InfraNode> nodesNearby(double x, double y) {
