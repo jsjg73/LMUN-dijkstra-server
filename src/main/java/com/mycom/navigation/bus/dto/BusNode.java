@@ -1,14 +1,8 @@
 package com.mycom.navigation.bus.dto;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import com.mycom.navigation.infra.InfraNode;
 
-import java.util.Set;
-
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
