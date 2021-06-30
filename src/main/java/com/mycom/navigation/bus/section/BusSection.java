@@ -2,12 +2,8 @@ package com.mycom.navigation.bus.section;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
-import com.mycom.navigation.bus.dto.BusNode;
 import com.mycom.navigation.infra.InfraNode;
 import com.mycom.navigation.infra.Infrastructure;
 
