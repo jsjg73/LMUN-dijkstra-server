@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections4.MapIterator;
+import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
 
 import com.mycom.navigation.bus.dto.Bus;
@@ -40,41 +42,14 @@ public class BusInfraFactory {
 			}
 		}
 	}
-	
+	private List<String[]> busNodesFromExternalData;
+	private MultiKeyMap<String, String> realPathsBetweenNodes;
 	public void construct() {
-		List<String[]> busStopByRoute = reader.readBusNodeByRoute();
-		MultiKeyMap<String, String> realPathsBetweenStops = reader.loadRealPath();
-		// pre - next 로 검색할 수 있도록 자료구조 수정
 		
-		int val =1;
-		String realPath = null ;
-		BusNode previousStop = null;
-		for(String[] record : busStopByRoute) {
-			addBus(record);
-			addBusNode(record);
-			
-			//connect
-			BusNode currentStop = (BusNode) busInfra.getNode(record[NODE_ID]);
-			if("1".equals(record[ORDER])) {
-				previousStop = currentStop;
-			}else {
-				String currRealPath =realPathsBetweenStops.get(previousStop.getNodeId(), currentStop.getNodeId());
-				if(realPath ==  null) {
-					realPath = currRealPath;
-				}else {
-					realPath +=","+ currRealPath;
-				}
-				if(!currentStop.isEnable()){
-					val+=WEIGHT_NON_STOP;
-				}else {
-					// 경로 추가 
-					previousStop.addNextNode(currentStop, val, realPath);
-					previousStop = currentStop;
-					val = 1;
-					realPath = null;
-				}
-			}
-		}
+		readExternalBusInformation();
+		
+		addDataToInfra();
+		
 		busInfra.createIndexingStructure();
 		
 		initBusSection();
@@ -82,29 +57,26 @@ public class BusInfraFactory {
 		transferOnFootIterating();
 		
 	}
-
-	private void transferOnFootIterating() {
-		Iterator<InfraNode> iter = busInfra.nodesIterator();
-		while(iter.hasNext()) {
-			InfraNode curr = iter.next();
-			transferOnFoot(curr);
-		}
+	
+	private void readExternalBusInformation() {
+		busNodesFromExternalData = reader.readExternalBusData();
+		realPathsBetweenNodes = reader.loadRealPath();
 	}
-
-	private void transferOnFoot(InfraNode curr) {
-		Set<InfraNode> nodesNearbyCurr = busInfra.nodesNearby(curr.getX(), curr.getY());
-		for(InfraNode node : nodesNearbyCurr) {
-			if(curr.connected(node))continue;
-			curr.addNextNode(node, WEIGHT_FOR_WALKING, "");
-		}
+	
+	private void addDataToInfra() {
+		
+		for(String[] record : busNodesFromExternalData) {
+			addData(record);
+			extendConnectionBetweenNodes(record);
+		}		
 	}
+	
+	
 
-	private void initBusSection() {
-		BusSection section = new BusSection();
-		section.initialization(busInfra);
-		busInfra.setSection(section);
+	private void addData(String[] record) {
+		addBus(record);
+		addBusNode(record);
 	}
-
 	private void addBus(String[] record) {
 		String busId = record[BUS_ID];
 		if (busId == null)
@@ -135,5 +107,73 @@ public class BusInfraFactory {
 			busInfra.addNode(stop);
 		}
 	}
+	
+	private int weight =1;
+	private String realPath = null ;
+	private BusNode previousNode = null;
+	private BusNode currentNode = null;
+	
+	private void extendConnectionBetweenNodes(String[] record) {
+		currentNode = (BusNode) busInfra.getNode(record[NODE_ID]);
+		if(isFirstNode(record[ORDER])) {
+			previousNode = currentNode;
+		}else {
+			connect();
+		}
+	}
+
+	private boolean isFirstNode(String order) {
+		return "1".equals(order);
+	}
+	
+	private void connect() {
+			updateRealPath();
+			connectNodes();
+	}
+	
+	private void updateRealPath() {
+		String currRealPath =realPathsBetweenNodes.get(previousNode.getNodeId(), currentNode.getNodeId());
+		if(realPath !=  null) 
+			realPath +=",";
+		realPath += currRealPath;
+	}
+	
+	//TODO 부수효과 제거
+	//cleancode54 : 부수효과를 일으키지마라 위배
+	private void connectNodes() {
+		if(!currentNode.isEnable()){
+			weight+=WEIGHT_NON_STOP;
+		}else {
+			// 경로 추가 
+			previousNode.addNextNode(currentNode, weight, realPath);
+			previousNode = currentNode;
+			weight = 1;
+			realPath = null;
+		}
+	}
+
+	private void transferOnFootIterating() {
+		Iterator<InfraNode> iter = busInfra.nodesIterator();
+		while(iter.hasNext()) {
+			InfraNode curr = iter.next();
+			transferOnFoot(curr);
+		}
+	}
+
+	private void transferOnFoot(InfraNode curr) {
+		Set<InfraNode> nodesNearbyCurr = busInfra.nodesNearby(curr.getX(), curr.getY());
+		for(InfraNode node : nodesNearbyCurr) {
+			if(curr.connected(node))continue;
+			curr.addNextNode(node, WEIGHT_FOR_WALKING, "");
+		}
+	}
+
+	private void initBusSection() {
+		BusSection section = new BusSection();
+		section.initialization(busInfra);
+		busInfra.setSection(section);
+	}
+
+	
 
 }

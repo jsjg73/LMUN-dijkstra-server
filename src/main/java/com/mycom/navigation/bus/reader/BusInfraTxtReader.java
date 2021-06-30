@@ -20,7 +20,7 @@ import org.apache.commons.collections4.map.MultiKeyMap;
  * */
 public class BusInfraTxtReader implements BusInfraReader{
 
-	public List<String[]> readBusNodeByRoute() {
+	public List<String[]> readExternalBusData() {
 		List<String[]> busStopByRoute = new ArrayList<String[]>();
 		try {
 			FileInputStream busStopByRouteFile = new FileInputStream("C:/workspace/practice/ReadExcelFile/Stations.txt");
