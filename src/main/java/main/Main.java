@@ -15,7 +15,8 @@ public class Main {
 		
 		// 버스 인프라 구축
 		BusInfraReader bifReader = new BusInfraTxtReader();
-		BusInfra bif = BusInfraFactory.construct(bifReader, 500, 500);
+		
+		BusInfra bif =  new BusInfraFactory(bifReader).createOnlyOnce();
 		
 		Navigator dijkstraNavi = new DijkstraNavigator(bif);
 		
