@@ -16,12 +16,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BusSection {
+	private final int ROW=500, COL=500;
 	private Set<InfraNode>[][] sections;
 	private XY minXY ;
 	private XY maxXY ;
-	private RC limitRC;
-	public BusSection(int row, int col) {
-		limitRC = new RC(row, col);
+	public BusSection() {
 		maxXY = new XY(0,  0);
 		minXY = new XY(999, 999);
 	}
@@ -33,12 +32,10 @@ public class BusSection {
 			throw new IllegalStateException("모든 버스 정류장 정보가 필요합니다.");
 		}
 		updateMinMaxXY(busInfra);
-		int row = limitRC.getRow();
-		int col = limitRC.getCol();
-		XUnit = ((maxXY.getX() - minXY.getX())/row); // 0.0011009615529999905
-		YUnit = ((maxXY.getY() - minXY.getY())/col); // 0.0016079761373999873
+		XUnit = ((maxXY.getX() - minXY.getX())/ROW); // 0.0011009615529999905
+		YUnit = ((maxXY.getY() - minXY.getY())/COL); // 0.0016079761373999873
 
-		sections = new HashSet[row+2][col+2];
+		sections = new HashSet[ROW+2][COL+2];
 		Iterator<InfraNode> iter = busInfra.nodesIterator();
 		while(iter.hasNext()) {
 			InfraNode node = iter.next();
@@ -82,7 +79,7 @@ public class BusSection {
 	}
 	
 	private boolean posible(int r, int c) {
-		return r>=0 && r < limitRC.getRow() && c>=0 && c<limitRC.getCol();
+		return r>=0 && r < ROW && c>=0 && c< COL;
 	}
 	private void unionEnabled(Set<InfraNode> big, Set<InfraNode> small){
 		for(InfraNode node : small) {
